@@ -80,13 +80,12 @@ def evaluate_lstm(dataloader, model, criterion):
         if len(sample_x) != 0:
 
             sample_x = np.stack(sample_x)
-            input = Variable(torch.FloatTensor(sample_x), requires_grad=False)
-            input = torch.transpose(input, 0, 1)
-            target = Variable(torch.FloatTensor(sample["y"].to_numpy()), requires_grad=False)
+            input = torch.FloatTensor(sample_x)
+            #input = torch.transpose(input, 0, 1)
+            target = torch.FloatTensor(sample["y"].numpy())
 
             out = model(input)
-
-            loss = criterion(out, target)
+            loss = criterion(out, target[-1])
 
             loss_val += float(loss.data.numpy())
             pred_val.extend(out.data.numpy().flatten().tolist())
@@ -101,7 +100,7 @@ def backtest(predictions, y):
     real = [1]
     index = [1]
     for r in range(len(predictions)):
-        rets= y.to_numpy().flatten().tolist()
+        rets= y.numpy().flatten().tolist()
         ret = rets[r]
         real.append(real[-1]*(1+ret))
 

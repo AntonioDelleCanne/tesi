@@ -17,13 +17,12 @@ class Sequence(nn.Module):
         self.nb_layers=nb_layers
         self.lstm = nn.LSTM(self.nb_features, self.hidden_size, self.nb_layers, dropout=dropout)
         self.lin = nn.Linear(self.hidden_size,1)
+        h0 = torch.zeros(self.nb_layers, 1, self.hidden_size)
+        c0 = torch.zeros(self.nb_layers, 1, self.hidden_size)
+        self.hidden_cell = (h0, c0)
 
     def forward(self, input):
-        h0 = Variable(torch.zeros(self.nb_layers, input.size()[1], self.hidden_size))
-        #print(type(h0))
-        c0 = Variable(torch.zeros(self.nb_layers, input.size()[1], self.hidden_size))
-        #print(type(c0))
-        output, hn = self.lstm(input, (h0, c0))
+        lstm_out, hn = self.lstm(input.view(len(input) ,1, -1), self.hidden_cell)
         #output = F.relu(self.lin(output))
-        out = self.lin(output[-1])
-        return out
+        out = self.lin(lstm_out.view(len(input), -1))
+        return out[-1]
