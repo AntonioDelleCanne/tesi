@@ -2,7 +2,7 @@ import pywt
 from statsmodels.robust import mad
 import numpy as np
 
-def waveletSmooth( x, wavelet="db4", level=1, DecLvl=2, title=None):
+def waveletSmooth( x, wavelet="db4", level=1, DecLvl=0, title=None):
     # calculate the wavelet coefficients
     coeff = pywt.wavedec( x, wavelet, mode="per", level=DecLvl )
     # calculate a threshold
