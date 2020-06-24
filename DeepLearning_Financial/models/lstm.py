@@ -26,3 +26,7 @@ class Sequence(nn.Module):
         #output = F.relu(self.lin(output))
         out = self.lin(lstm_out.view(len(input), -1))
         return out[-1]
+    
+    
+    
+    
