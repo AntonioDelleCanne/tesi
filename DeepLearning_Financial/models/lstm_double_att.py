@@ -26,15 +26,16 @@ class SequenceDoubleAtt(nn.Module):
         c02 = torch.zeros(self.nb_layers, 1, self.hidden_size*2)
         self.hidden_cell2 = (h02, c02)
         self.softmax = nn.Softmax(0)
-        #aggiungi softmax function
+        self.tanh = nn.Tanh()
 
     def forward(self, input):
         lstm1_out, hn1 = self.lstm1(input.view(len(input) ,1, -1), self.hidden_cell1)
         lstm2_out, hn2 = self.lstm2(lstm1_out.view(len(input) ,1, -1), self.hidden_cell2)
         #output = F.relu(self.lin(output))
-        out = self.lin(lstm2_out.view(len(input), -1))
-        w = self.softmax(out)
-        res = torch.mean(out*w, axis=0)
+        e = self.lin(lstm2_out.view(len(input), -1))
+        et = self.tanh(e)
+        w = self.softmax(et)
+        res = torch.mean(lstm2_out*w, axis=0)
         return res
     
     

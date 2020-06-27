@@ -21,12 +21,13 @@ class SequenceAtt(nn.Module):
         c0 = torch.zeros(self.nb_layers, 1, self.hidden_size)
         self.hidden_cell = (h0, c0)
         self.softmax = nn.Softmax(0)
+        self.tanh = nn.Tanh()
 
     def forward(self, input):
         lstm_out, hn = self.lstm(input.view(len(input) ,1, -1), self.hidden_cell)
-        #output = F.relu(self.lin(output))
-        out = self.lin(lstm_out.view(len(input), -1))
-        w = self.softmax(out)
-        res = torch.mean(out*w, axis=0)
+        e = self.lin(lstm_out.view(len(input), -1))
+        et = self.tanh(e)
+        w = self.softmax(et)
+        res = torch.mean(lstm_out*w, axis=0)
         return res
     

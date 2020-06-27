@@ -46,7 +46,7 @@ class Autoencoder(torch.nn.Module):
     # end method
 
 
-    def fit(self, X, n_epoch=10, batch_size=64, en_shuffle=True):
+    def fit(self, X, val=None, n_epoch=10, batch_size=64, en_shuffle=True):
         for epoch in range(n_epoch):
             if en_shuffle:
                 print("Data Shuffled")
@@ -60,10 +60,18 @@ class Autoencoder(torch.nn.Module):
                 self.optimizer.zero_grad()                             # clear gradients for this training step
                 loss.backward()                                        # backpropagation, compute gradients
                 self.optimizer.step()                                  # apply gradients
-                if local_step % 50 == 0:
-                    print ("Epoch %d/%d | Step %d/%d | train loss: %.4f | l1 loss: %.4f | sparsity loss: %.4f"
-                           %(epoch+1, n_epoch, local_step, len(X)//batch_size,
-                             loss.data, l1_loss.data, sparsity_loss.data))
+                
+            with torch.no_grad():
+                val_error = -1
+                inputs = torch.from_numpy(X.astype(np.float32))
+                outputs, loss = self.forward(inputs)
+                train_error = abs(inputs - outputs).mean() 
+                if(val is not None):
+                    inputs = torch.from_numpy(val.astype(np.float32))
+                    outputs, loss = self.forward(inputs)
+                    val_error = abs(inputs - outputs).mean() 
+                print ("Epoch %d/%d | train loss: %.4f | train_error %.4f | valid_error %.4f"
+                    %(epoch+1, n_epoch, loss.data, train_error, val_error))
     # end method
 
 
