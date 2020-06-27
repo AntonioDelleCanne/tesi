@@ -35,7 +35,8 @@ class SequenceDoubleAtt(nn.Module):
         e = self.lin(lstm2_out.view(len(input), -1))
         et = self.tanh(e)
         w = self.softmax(et)
-        res = torch.mean(lstm2_out*w, axis=0)
+        res = torch.mean(lstm2_out*w, axis=0) #TODO fix size
+        print(res)
         return res
     
     
