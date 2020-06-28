@@ -56,7 +56,20 @@ def load(name):
     with open(name + '.pkl', 'rb') as f:
         return pickle.load(f)
     
-    
+
+
+def gain(C, C_pred, opn):
+    O = opn.reindex_like(C)
+    CO_diff = C - O
+    growth = C_pred > O
+    decline = C_pred < O
+    return CO_diff[growth].sum() - CO_diff[decline].sum()
+
+
+def roi(C, C_pred, opn):
+    mean_opn = opn.reindex_like(C).mean()
+    return gain(C, C_pred, opn) / mean_opn
+
     
 def fill_dates(df):
     dates = pd.date_range(start=df.index.min(), end=df.index.max())
@@ -227,12 +240,12 @@ def get_datasets(indices = ['^GSPC'],  feature_sets = ['open', 'ohlcv', 'ext'], 
     for index in indices:
         datasets[index] = {}
         datasets[index]["original"] = get_index(index=index, start_date=start_date, end_date=end_date)
-        datasets[index]["original"] = fill_dates(datasets[index]["original"])
+        datasets[index]["original"] = fill_dates(datasets[index]["original"].copy())
         datasets[index]["features"] = {}
-        datasets[index]["target"] = datasets[index]["original"]["Close"]
+        datasets[index]["target"] = datasets[index]["original"]["Close"].copy()
         print(datasets)
         for feature_set in feature_sets:
-            data = get_dataset_by_name(datasets[index]["original"], name=feature_set)
+            data = get_dataset_by_name(datasets[index]["original"].copy(), name=feature_set)
             data = data.dropna()
             if(start_data is None):
                 start_data = data.index.min()
