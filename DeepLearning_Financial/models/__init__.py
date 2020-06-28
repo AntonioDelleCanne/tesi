@@ -1,5 +1,4 @@
 from .sparse_autoencoder import Autoencoder 
-from .lstm import Sequence
 from .lstm_double import SequenceDouble
 from .lstm_double_att import SequenceDoubleAtt
 from .lstm_att import SequenceAtt
