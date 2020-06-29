@@ -47,7 +47,7 @@ from utils import prepare_data_lstm, ExampleDataset, save_checkpoint, evaluate_l
 
 
 def get_model_names():
-    return ['lstm_moro', 'lstm_att', 'lstm_sa']
+    return ['lstm_sa', 'lstm_att', 'lstm_moro', 'lstm_sa_att']
 
 def get_model(model_name, save_name, train_split=None):
     model = None
@@ -66,7 +66,7 @@ def get_model(model_name, save_name, train_split=None):
             module=SequenceDouble,
             optimizer=optim.Adam,
             batch_size=batch_size,
-            max_epochs = 2000, # TODO trovato empiricamente
+            max_epochs = 1000, # trovato empiricamente
             train_split=train_split,
             callbacks=cb,
 

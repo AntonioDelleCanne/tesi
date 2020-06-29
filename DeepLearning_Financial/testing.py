@@ -70,14 +70,14 @@ def roi(C, C_pred, opn):
     mean_opn = opn.reindex_like(C).mean()
     return gain(C, C_pred, opn) / mean_opn
 
-    
+#aggiunge le date mancanti usando come valore quello medio della precedente e della successiva note
 def fill_dates(df):
     dates = pd.date_range(start=df.index.min(), end=df.index.max())
     for date in dates:
         if(date not in df.index):
             df.loc[date] = None
     df = df.sort_index()
-    return df.fillna(method='ffill')
+    return (df.fillna(method='ffill') + df.fillna(method='bfill'))/2
 
     
 #returns open high low close volume
@@ -208,7 +208,7 @@ def apply_wavelet_transform(data, consider_future=False, wavelet='haar'):
     return res
 
 
-def get_dataset_train(datasets, feature_set, train_dates, val_dates, index='^GSPC', sa=None, load=False):   
+def get_dataset_train(datasets, feature_set, train_dates, val_dates, index='^GSPC', sa=None, ld=False):   
     
     y = datasets[index]["target"]
     dataset = datasets['^GSPC']["features"][feature_set]
@@ -220,7 +220,7 @@ def get_dataset_train(datasets, feature_set, train_dates, val_dates, index='^GSP
     y_train, y_val = y_scaler.fit_transform(y.iloc[train_dates].to_numpy(np.float32)[...,None]), y_scaler.transform(y.iloc[val_dates].to_numpy(np.float32)[...,None])
     
     if(sa is not None):
-        if(not load):
+        if(not ld):
             encoder = get_encoder(x_train, x_val, sa_hidden_size=10)
             save(encoder, sa)
         encoder = load(sa)
