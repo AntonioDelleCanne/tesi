@@ -47,20 +47,28 @@ from utils import prepare_data_lstm, ExampleDataset, save_checkpoint, evaluate_l
 
 
 def get_model_names():
-    return ['lstm_moro']
+    return ['lstm_moro', 'lstm_att', 'lstm_sa']
 
-def get_model(model_name):
+def get_model(model_name, save_name, train_split=None):
     model = None
     feature_set = None
     
+    cb =[
+        callbacks.EpochScoring('neg_mean_absolute_error', lower_is_better=False),
+        callbacks.EpochScoring('r2', lower_is_better=False),
+        callbacks.Checkpoint(monitor='valid_loss_best', f_pickle=save_name)        
+    ]
+    
     if(model_name is 'lstm_moro'):
         feature_set = 'open'
+        batch_size = 20
         model = NeuralNetRegressor(
             module=SequenceDouble,
             optimizer=optim.Adam,
             batch_size=batch_size,
-            max_epochs = 400, #trovato empiricamente
-            train_split=None,
+            max_epochs = 2000, # TODO trovato empiricamente
+            train_split=train_split,
+            callbacks=cb,
 
             module__nb_features=1,
             module__hidden_size=256,
@@ -74,15 +82,41 @@ def get_model(model_name):
             module=SequenceDoubleAtt,
             optimizer=optim.Adam,
             batch_size=batch_size,
-            max_epochs=250, # TODO trovato empiricamente
-            train_split=None,
-            callbacks=[
-                callbacks.EpochScoring('neg_mean_absolute_error', lower_is_better=False),
-                callbacks.EpochScoring('r2', lower_is_better=False),
-                callbacks.Checkpoint(monitor='valid_loss_best', f_pickle='lstm_sa_best')        
-            ],
+            max_epochs=2000, # TODO trovato empiricamente
+            train_split=train_split,
+            callbacks=cb,
 
             module__nb_features=5,
+            module__hidden_size=256,
+            optimizer__lr=0.0001
+        )
+    elif(model_name is 'lstm_sa'):
+        feature_set = 'ext_sa'
+        batch_size = 20
+        model = NeuralNetRegressor(
+            module=SequenceDouble,
+            optimizer=optim.Adam,
+            batch_size=batch_size,
+            max_epochs=2000, # TODO trovato empiricamente
+            train_split=train_split,
+            callbacks=cb,
+
+            module__nb_features=10,
+            module__hidden_size=256,
+            optimizer__lr=0.0001
+        )
+    elif(model_name is 'lstm_sa_att'):
+        feature_set = 'ext_sa'
+        batch_size = 20
+        model = NeuralNetRegressor(
+            module=SequenceDoubleAtt,
+            optimizer=optim.Adam,
+            batch_size=batch_size,
+            max_epochs=2000, # TODO trovato empiricamente
+            train_split=train_split,
+            callbacks=cb,
+
+            module__nb_features=10,
             module__hidden_size=256,
             optimizer__lr=0.0001
         )
