@@ -211,13 +211,14 @@ def apply_wavelet_transform(data, consider_future=False, wavelet='haar'):
 def get_dataset_train(datasets, feature_set, train_dates, val_dates, index='^GSPC', sa=None, ld=False):   
     
     y = datasets[index]["target"]
-    dataset = datasets['^GSPC']["features"][feature_set]
+    dataset = datasets[index]["features"][feature_set]
        
     x_scaler = StandardScaler()
     y_scaler = StandardScaler()
     
-    x_train, x_val = x_scaler.fit_transform(dataset.iloc[train_dates].to_numpy(np.float32)), x_scaler.transform(dataset.iloc[val_dates].to_numpy(np.float32))
     y_train, y_val = y_scaler.fit_transform(y.iloc[train_dates].to_numpy(np.float32)[...,None]), y_scaler.transform(y.iloc[val_dates].to_numpy(np.float32)[...,None])
+    x_train, x_val = x_scaler.fit_transform(dataset.iloc[train_dates].to_numpy(np.float32)), x_scaler.transform(dataset.iloc[val_dates].to_numpy(np.float32))
+    
     
     if(sa is not None):
         if(not ld):
