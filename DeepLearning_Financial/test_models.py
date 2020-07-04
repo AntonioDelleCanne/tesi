@@ -82,7 +82,7 @@ def get_model(model_name, save_name, train_split=None):
             module=SequenceDoubleAtt,
             optimizer=optim.Adam,
             batch_size=batch_size,
-            max_epochs=600, # TODO trovato empiricamente
+            max_epochs=1000, # TODO trovato empiricamente
             train_split=train_split,
             callbacks=cb,
 

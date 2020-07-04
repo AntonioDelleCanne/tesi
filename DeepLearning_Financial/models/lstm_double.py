@@ -16,16 +16,16 @@ class SequenceDouble(nn.Module):
         self.nb_features=nb_features
         self.hidden_size=hidden_size
         self.nb_layers=nb_layers
-        self.lstm1 = nn.LSTM(self.nb_features, self.hidden_size, self.nb_layers, dropout=dropout, batch_first=True)
-        self.lstm2 = nn.LSTM(self.hidden_size, self.hidden_size*2, self.nb_layers, dropout=dropout, batch_first=True)
-        self.lin = nn.Linear(self.hidden_size*2,1)
+        self.lstm1 = nn.LSTM(self.nb_features, self.hidden_size*2, self.nb_layers, dropout=dropout, batch_first=True)
+        self.lstm2 = nn.LSTM(self.hidden_size*2, self.hidden_size, self.nb_layers, dropout=dropout, batch_first=True)
+        self.lin = nn.Linear(self.hidden_size,1)
 
     def forward(self, input):
-        h01 = torch.zeros(self.nb_layers, input.size()[0], self.hidden_size)#TODO fix
-        c01 = torch.zeros(self.nb_layers, input.size()[0], self.hidden_size)
+        h01 = torch.zeros(self.nb_layers, input.size()[0], self.hidden_size*2)
+        c01 = torch.zeros(self.nb_layers, input.size()[0], self.hidden_size*2)
         hidden_cell1 = (h01, c01)
-        h02 = torch.zeros(self.nb_layers, input.size()[0], self.hidden_size*2)#TODO adatta per nuova struttura
-        c02 = torch.zeros(self.nb_layers, input.size()[0], self.hidden_size*2)
+        h02 = torch.zeros(self.nb_layers, input.size()[0], self.hidden_size)
+        c02 = torch.zeros(self.nb_layers, input.size()[0], self.hidden_size)
         hidden_cell2 = (h02, c02)
         lstm1_out, hn1 = self.lstm1(input, hidden_cell1)
         lstm2_out, hn2 = self.lstm2(lstm1_out, hidden_cell2)
