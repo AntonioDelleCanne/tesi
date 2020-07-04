@@ -49,7 +49,7 @@ from utils import prepare_data_lstm, ExampleDataset, save_checkpoint, evaluate_l
 def get_model_names():
     return ['lstm_sa', 'lstm_att', 'lstm_moro', 'lstm_sa_att']
 
-def get_model(model_name, save_name, train_split=None):
+def get_model(model_name, save_name, train_split=None, roi_test=None):
     model = None
     feature_set = None
     
@@ -58,6 +58,10 @@ def get_model(model_name, save_name, train_split=None):
         callbacks.EpochScoring('r2', lower_is_better=False),
         callbacks.Checkpoint(monitor='valid_loss_best', f_pickle=save_name)        
     ]
+    if(roi_test is not None):
+        roi_save= 'best_roi_' + save_name
+        cb.append(callbacks.EpochScoring(roi_test, lower_is_better=False))
+#         cb.append(callbacks.Checkpoint(monitor='roi_train_best', f_pickle=roi_save))
     
     if(model_name is 'lstm_moro'):
         feature_set = 'open'

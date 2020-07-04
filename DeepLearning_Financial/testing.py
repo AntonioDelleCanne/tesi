@@ -65,10 +65,25 @@ def gain(C, C_pred, opn):
     decline = C_pred < O
     return CO_diff[growth].sum() - CO_diff[decline].sum()
 
+def gain_train(C, C_pred, opn):
+    O = opn
+    CO_diff = C - O
+    growth = C_pred > O
+    decline = C_pred < O
+    return CO_diff[growth].sum() - CO_diff[decline].sum()
+
 
 def roi(C, C_pred, opn):
-    mean_opn = opn.reindex_like(C).mean()
+#     mean_opn = opn.reindex_like(C).mean()
     return gain(C, C_pred, opn) / mean_opn
+
+def roi_train(model, X, y, opn):
+    
+    C = model.y_scaler.inverse_transform(y.squeeze())
+    C_pred=model.predict(X).squeeze()
+    C_pred = model.y_scaler.inverse_transform(C_pred)
+    mean_opn = opn.mean()
+    return gain_train(C, C_pred, opn) / mean_opn
 
 #aggiunge le date mancanti usando come valore quello medio della precedente e della successiva note
 def fill_dates(df):
